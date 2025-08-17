@@ -3,6 +3,8 @@ package pw.chew.mlb.listeners;
 import com.jagrosh.jdautilities.commons.utils.TableBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
@@ -10,7 +12,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -583,7 +584,7 @@ public class GameFeedHandler {
                     ## Final Scorecard
                     %s
                     """.formatted(currentState.summary(), currentState.decisions(), scorecard))
-                    .setActionRow(Button.primary("gameinfo:send:%s".formatted(currentState.gamePk()), "View Game Info"))
+                    .setComponents(ActionRow.of(Button.primary("gameinfo:send:%s".formatted(currentState.gamePk()), "View Game Info")))
                     .queue();
             } catch (InsufficientPermissionException ignored) {
                 logger.debug("Insufficient permissions to send message to channel " + game.channelId());

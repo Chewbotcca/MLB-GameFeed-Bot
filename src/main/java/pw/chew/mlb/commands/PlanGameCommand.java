@@ -2,6 +2,8 @@ package pw.chew.mlb.commands;
 
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
@@ -15,7 +17,6 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import pw.chew.mlb.objects.GameBlurb;
 import pw.chew.mlb.objects.ImageUtil;
@@ -124,7 +125,7 @@ public class PlanGameCommand extends SlashCommand {
                 TextChannel textChannel = (TextChannel) channel;
 
                 if (!makeThread) {
-                    textChannel.sendMessageEmbeds(blurb.blurb()).setActionRow(buildButtons(gamePk, blurb)).queue(message -> {
+                    textChannel.sendMessageEmbeds(blurb.blurb()).setComponents(buildButtons(gamePk, blurb)).queue(message -> {
                         int index = status.indexOf("Sending Message...");
                         status.set(index, "Sending Message... Done! " + message.getJumpUrl());
 
@@ -138,7 +139,7 @@ public class PlanGameCommand extends SlashCommand {
                     status.set(index, "Creating Thread... Done!");
                     event.editOriginal(String.join("\n", status)).queue();
 
-                    threadChannel.sendMessageEmbeds(blurb.blurb()).setActionRow(buildButtons(gamePk, blurb)).queue(msg -> {
+                    threadChannel.sendMessageEmbeds(blurb.blurb()).setComponents(buildButtons(gamePk, blurb)).queue(msg -> {
                         try {
                             msg.pin().queue();
                         } catch (InsufficientPermissionException ignored) {
@@ -154,7 +155,7 @@ public class PlanGameCommand extends SlashCommand {
             case FORUM -> {
                 ForumChannel forumChannel = (ForumChannel) channel;
 
-                forumChannel.createForumPost(blurb.name(), MessageCreateData.fromEmbeds(blurb.blurb())).setActionRow(buildButtons(gamePk, blurb)).queue(forumPost -> {
+                forumChannel.createForumPost(blurb.name(), MessageCreateData.fromEmbeds(blurb.blurb())).setComponents(buildButtons(gamePk, blurb)).queue(forumPost -> {
                     try {
                         forumPost.getMessage().pin().queue();
                     } catch (InsufficientPermissionException ignored) {
@@ -174,8 +175,8 @@ public class PlanGameCommand extends SlashCommand {
         event.replyChoices(AutocompleteUtil.handleInput(event)).queue();
     }
 
-    public static List<Button> buildButtons(String gamePk, GameBlurb blurb) {
-        return List.of(
+    public static ActionRow buildButtons(String gamePk, GameBlurb blurb) {
+        return ActionRow.of(
             Button.success("plangame:start:"+gamePk, "Start"),
             Button.secondary("plangame:refresh:"+gamePk, "Refresh Embed"),
             Button.primary("plangame:lineup:"+gamePk+":away", blurb.away().name() + " Lineup").withEmoji(TeamEmoji.fromTeamId(blurb.away().id())),

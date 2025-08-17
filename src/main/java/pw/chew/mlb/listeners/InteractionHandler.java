@@ -23,7 +23,7 @@ public class InteractionHandler extends ListenerAdapter {
                 case "refresh" -> event.deferEdit().queue(e -> {
                     GameBlurb blurb = new GameBlurb(gamePk);
                     e.editOriginalEmbeds(blurb.blurb())
-                        .setActionRow(PlanGameCommand.buildButtons(gamePk, blurb))
+                        .setComponents(PlanGameCommand.buildButtons(gamePk, blurb))
                         .queue();
                 });
                 case "start" -> {

@@ -2,9 +2,10 @@ package pw.chew.mlb.commands;
 
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.Checks;
 import pw.chew.mlb.listeners.GameFeedHandler;
 import pw.chew.mlb.objects.ActiveGame;
@@ -37,11 +38,11 @@ public class ScoreCommand extends SlashCommand {
             }
 
             event.reply(buildScore(currentServerGame.gamePk(), currentServerGame.channelId()))
-                .setActionRow(Button.primary("gameinfo:send:%s".formatted(currentServerGame.gamePk()), "View Game Info"))
+                .setComponents(ActionRow.of(Button.primary("gameinfo:send:%s".formatted(currentServerGame.gamePk()), "View Game Info")))
                 .setEphemeral(true).queue();
         } else {
             event.reply(buildScore(currentGame, null))
-                .setActionRow(Button.primary("gameinfo:send:%s".formatted(currentGame), "View Game Info"))
+                .setComponents(ActionRow.of(Button.primary("gameinfo:send:%s".formatted(currentGame), "View Game Info")))
                 .setEphemeral(true).queue();
         }
     }
