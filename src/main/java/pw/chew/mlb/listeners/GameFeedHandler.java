@@ -3,6 +3,8 @@ package pw.chew.mlb.listeners;
 import com.jagrosh.jdautilities.commons.utils.TableBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
@@ -10,7 +12,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -192,7 +193,7 @@ public class GameFeedHandler {
      * @param gamePk The gamePk of the game to run.
      */
     private static void runGame(String gamePk) {
-        logger.debug("Starting game with gamePk: " + gamePk);
+        logger.debug("Starting game with gamePk: {}", gamePk);
 
         if (gamePk.isEmpty()) {
             return;
@@ -269,7 +270,7 @@ public class GameFeedHandler {
 
             // Check for new changes in the description
             if (recentState.atBatIndex() >= 0 && !recentState.currentPlayDescription().equals(currentState.currentPlayDescription())) {
-                logger.debug("New play description for gamePk " + gamePk + ": " + recentState.currentPlayDescription());
+                logger.debug("New play description for gamePk {}: {}", gamePk, recentState.currentPlayDescription());
 
                 boolean scoringPlay = recentState.home().runs() != currentState.home().runs() || recentState.away().runs() != currentState.away().runs();
                 boolean hasOut = recentState.outs() != currentState.outs() && recentState.outs() > 0;
@@ -367,9 +368,21 @@ public class GameFeedHandler {
             if (!currentState.inningState().equals(recentState.inningState())) {
                 // Ignore if the state is "Middle" or "End"
                 if (!recentState.inningState().equals("Middle") && !recentState.inningState().equals("End")) {
+                    String upToBat = """
+                        Next up: %s
+                        On deck: %s
+                        In the hole: %s
+                        """
+                        .formatted(
+                            currentState.offenseBatter(), currentState.onDeck(), currentState.inTheHole()
+                        );
+
                     EmbedBuilder inningEmbed = new EmbedBuilder()
                         .setTitle("Inning State Updated")
-                        .setDescription(recentState.inningState() + " of the " + recentState.inningOrdinal());
+                        .setDescription(
+                            recentState.inningState() + " of the " + recentState.inningOrdinal()
+                             + "\n\n" + upToBat
+                        );
 
                     sendMessages(inningEmbed.build(), gamePk);
                 }
@@ -571,7 +584,7 @@ public class GameFeedHandler {
                     ## Final Scorecard
                     %s
                     """.formatted(currentState.summary(), currentState.decisions(), scorecard))
-                    .setActionRow(Button.primary("gameinfo:send:%s".formatted(currentState.gamePk()), "View Game Info"))
+                    .setComponents(ActionRow.of(Button.primary("gameinfo:send:%s".formatted(currentState.gamePk()), "View Game Info")))
                     .queue();
             } catch (InsufficientPermissionException ignored) {
                 logger.debug("Insufficient permissions to send message to channel " + game.channelId());

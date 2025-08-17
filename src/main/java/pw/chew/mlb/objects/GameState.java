@@ -30,7 +30,7 @@ public record GameState(JSONObject gameData, String gamePk) {
      */
     @NotNull
     public static GameState fromPk(String gamePk) {
-        String res = RestClient.get("https://statsapi.mlb.com/api/v1.1/game/:id/feed/live?language=en&fields=gameData,venue,fieldInfo,capacity,weather,condition,temp,wind,gameInfo,attendance,game,pk,datetime,dateTime,status,detailedState,abstractGameState,liveData,plays,allPlays,result,rbi,description,awayScore,homeScore,event,about,inning,isTopInning,isComplete,count,balls,strikes,outs,playEvents,details,isInPlay,isScoringPlay,eventType,hitData,launchSpeed,launchAngle,totalDistance,trajectory,hardness,isPitch,atBatIndex,playId,currentPlay,scoringPlays,matchup,batter,fullName,pitcher,postOnFirst,postOnSecond,postOnThird,linescore,currentInning,currentInningOrdinal,inningState,teams,home,name,clubName,abbreviation,runs,away,innings,num,hits,errors,leftOnBase,decisions,winner,id,loser,save,boxscore,players,stats,pitching,note"
+        String res = RestClient.get("https://statsapi.mlb.com/api/v1.1/game/:id/feed/live?language=en&fields=gameData,venue,fieldInfo,capacity,weather,condition,temp,wind,gameInfo,attendance,game,pk,datetime,dateTime,status,detailedState,abstractGameState,liveData,plays,allPlays,result,rbi,description,awayScore,homeScore,event,about,inning,isTopInning,isComplete,count,balls,strikes,outs,playEvents,details,isInPlay,isScoringPlay,eventType,hitData,launchSpeed,launchAngle,totalDistance,trajectory,hardness,isPitch,atBatIndex,playId,currentPlay,scoringPlays,matchup,batter,fullName,pitcher,postOnFirst,postOnSecond,postOnThird,linescore,offense,onDeck,inHole,currentInning,currentInningOrdinal,inningState,teams,home,name,clubName,abbreviation,runs,away,innings,num,hits,errors,leftOnBase,decisions,winner,id,loser,save,boxscore,players,stats,pitching,note"
             .replace(":id", gamePk)).asString();
 
         try {
@@ -239,6 +239,33 @@ public record GameState(JSONObject gameData, String gamePk) {
      */
     public String currentBatter() {
         return currentPlay().getJSONObject("matchup").getJSONObject("batter").getString("fullName");
+    }
+
+    /**
+     * The next batter for the offense. Not necessarily the same as {@link #currentBatter()}.
+     *
+     * @return the next batter for the offense.
+     */
+    public String offenseBatter() {
+        return lineScore().getJSONObject("offense").getJSONObject("batter").getString("fullName");
+    }
+
+    /**
+     * The batter on deck (after the next batter) for the offense.
+     *
+     * @return the batter on deck for the offense.
+     */
+    public String onDeck() {
+        return lineScore().getJSONObject("offense").getJSONObject("onDeck").getString("fullName");
+    }
+
+    /**
+     * The batter in the hole (after the on deck batter) for the offense.
+     *
+     * @return the batter in the hole for the offense.
+     */
+    public String inTheHole() {
+        return lineScore().getJSONObject("offense").getJSONObject("inHole").getString("fullName");
     }
 
     /**

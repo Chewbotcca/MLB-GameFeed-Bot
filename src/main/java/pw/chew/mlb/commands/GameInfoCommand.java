@@ -3,6 +3,10 @@ package pw.chew.mlb.commands;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.selections.SelectOption;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
@@ -10,10 +14,6 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.internal.utils.Checks;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,6 +26,7 @@ import pw.chew.mlb.util.EmbedUtil;
 import pw.chew.mlb.util.MLBAPIUtil;
 import pw.chew.mlb.util.TeamEmoji;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -215,7 +216,7 @@ public class GameInfoCommand extends SlashCommand {
 
         // send the message, if the initial button is pressed
         if (event instanceof StringSelectInteractionEvent) {
-            event.replyEmbeds(embed.build()).addActionRow(refreshButton).setEphemeral(true).queue();
+            event.replyEmbeds(embed.build()).setComponents(ActionRow.of(refreshButton)).setEphemeral(true).queue();
         } else { // edit it if they're just clicking through
             event.editMessageEmbeds(embed.build()).queue();
         }

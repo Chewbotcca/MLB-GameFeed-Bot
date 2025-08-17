@@ -60,6 +60,11 @@ public class StartGameCommand extends SlashCommand {
             throw new IllegalStateException("This channel is already playing a game: " + currentGame + ". Please wait for it to finish, or stop it with `/stopgame`.");
         }
 
+        // Check to see if we can send messages
+        if (!channel.canTalk(channel.getGuild().getSelfMember())) {
+            throw new IllegalStateException("I cannot send messages in this channel. Please give me permission to send messages in this channel or ask an admin to and try again.");
+        }
+
         // Start a new thread
         ActiveGame activeGame = new ActiveGame(gamePk, channel.getId());
         GameState currentState = GameState.fromPk(gamePk);

@@ -1,7 +1,7 @@
 plugins {
     id("java")
     application
-    kotlin("jvm") version "1.9.25"
+    kotlin("jvm") version "2.2.10"
 }
 
 group = "pw.chew"
@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    implementation("net.dv8tion", "JDA", "5.5.0")
+    implementation("net.dv8tion", "JDA", "6.0.0-rc.2")
     implementation("pw.chew", "jda-chewtils", "2.1")
     implementation("org.json", "json", "20250107")
     implementation("ch.qos.logback", "logback-classic", "1.5.6")
@@ -36,10 +36,10 @@ tasks.getByName<Test>("test") {
     useJUnitPlatform()
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
-    kotlinOptions.apiVersion = "1.6"
-}
+//tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+//    kotlinOptions.jvmTarget = "21"
+//    kotlinOptions.apiVersion = "2.2"
+//}
 
 application {
     mainClass.set("pw.chew.mlb.MLBBot")

@@ -155,7 +155,14 @@ public class AutocompleteUtil {
         // Build games
         List<Command.Choice> choices = new ArrayList<>();
 
-        JSONArray games = gameResponse.getJSONArray("dates").getJSONObject(0).getJSONArray("games");
+        JSONArray dates = gameResponse.getJSONArray("dates");
+
+        // No games today
+        if (dates.isEmpty()) {
+            return choices;
+        }
+
+        JSONArray games = dates.getJSONObject(0).getJSONArray("games");
 
         for (int i = 0; i < games.length(); i++) {
             JSONObject game = games.getJSONObject(i);
