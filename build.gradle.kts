@@ -1,7 +1,7 @@
 plugins {
     id("java")
     application
-    kotlin("jvm") version "2.2.10"
+    kotlin("jvm") version "2.3.10"
 }
 
 group = "pw.chew"
@@ -19,17 +19,17 @@ repositories {
 }
 
 dependencies {
-    implementation("net.dv8tion", "JDA", "6.0.0-rc.2")
-    implementation("pw.chew", "jda-chewtils", "2.1")
+    implementation("net.dv8tion", "JDA", "6.3.0")
+    implementation("pw.chew", "jda-chewtils", "2.2.1")
     implementation("org.json", "json", "20250107")
-    implementation("ch.qos.logback", "logback-classic", "1.5.6")
+    implementation("ch.qos.logback", "logback-classic", "1.5.31")
     implementation("mysql", "mysql-connector-java", "8.0.33")
     implementation("org.mapdb", "mapdb", "3.1.0")
     implementation("org.hibernate", "hibernate-core", "5.6.15.Final")
-    implementation("com.github.ben-manes.caffeine", "caffeine", "3.1.8")
+    implementation("com.github.ben-manes.caffeine", "caffeine", "3.2.3")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.14.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.14.2")
 }
 
 tasks.getByName<Test>("test") {
