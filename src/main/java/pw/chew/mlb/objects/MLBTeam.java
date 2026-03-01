@@ -11,6 +11,14 @@ public record MLBTeam(JSONObject data) {
         return data.getJSONObject("team").getString("teamName");
     }
 
+    public String clubName() {
+        return data.getJSONObject("team").getString("clubName");
+    }
+
+    public String abbreviation() {
+        return data.getJSONObject("team").getString("abbreviation");
+    }
+
     public JSONObject record() {
         return data.getJSONObject("leagueRecord");
     }
@@ -21,6 +29,10 @@ public record MLBTeam(JSONObject data) {
 
     public int losses() {
         return record().getInt("losses");
+    }
+
+    public int score() {
+        return data.getInt("score");
     }
 
     public String probablePitcher() {
