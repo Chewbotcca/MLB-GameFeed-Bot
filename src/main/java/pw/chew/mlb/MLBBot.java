@@ -80,6 +80,7 @@ public class MLBBot {
             .setStatus(OnlineStatus.ONLINE)
             .enableCache(CacheFlag.SCHEDULED_EVENTS)
             .setActivity(Activity.playing("Booting..."))
+            .setMaxReconnectDelay(60)
             .addEventListeners(
                 waiter, commandClient // JDA-Chewtils stuff
                 , new JDAListeners()
