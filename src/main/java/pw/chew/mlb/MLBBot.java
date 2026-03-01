@@ -40,7 +40,7 @@ public class MLBBot {
     public static final List<JSONObject> TEAMS = new ArrayList<>();
     public static final EventWaiter waiter = new EventWaiter();
 
-    public static final int SEASON = 2025;
+    public static final int SEASON = 2026;
 
     public static void main(String[] args) throws IOException {
         // Load properties into the PropertiesManager
@@ -81,6 +81,7 @@ public class MLBBot {
             .setStatus(OnlineStatus.ONLINE)
             .enableCache(CacheFlag.SCHEDULED_EVENTS)
             .setActivity(Activity.playing("Booting..."))
+            .setMaxReconnectDelay(60)
             .addEventListeners(
                 waiter, commandClient // JDA-Chewtils stuff
                 , new JDAListeners()
