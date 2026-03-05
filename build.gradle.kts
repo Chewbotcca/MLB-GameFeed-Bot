@@ -25,11 +25,11 @@ dependencies {
     implementation("ch.qos.logback", "logback-classic", "1.5.31")
     implementation("mysql", "mysql-connector-java", "8.0.33")
     implementation("org.mapdb", "mapdb", "3.1.0")
-    implementation("org.hibernate", "hibernate-core", "5.6.15.Final")
+    implementation("org.hibernate", "hibernate-core", "7.2.6.Final")
     implementation("com.github.ben-manes.caffeine", "caffeine", "3.2.3")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.14.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.14.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.3")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:6.0.3")
 }
 
 tasks.getByName<Test>("test") {
