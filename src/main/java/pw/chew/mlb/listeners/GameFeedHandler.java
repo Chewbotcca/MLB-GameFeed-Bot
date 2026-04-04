@@ -524,8 +524,8 @@ public class GameFeedHandler {
 
             Instant sent = Instant.now();
             channel.sendMessageEmbeds(message).queueAfter(delay, TimeUnit.SECONDS, playMsg -> {
-                // Wait 30 seconds until after the original message was sent
-                long waitTime = 30 - Duration.between(sent, Instant.now()).getSeconds();
+                // Wait 45 seconds until after the original message was sent
+                long waitTime = 45 - Duration.between(sent, Instant.now()).getSeconds();
 
                 if (!gameState.potentialHomer()) return;
 
@@ -587,7 +587,7 @@ public class GameFeedHandler {
                     .setComponents(ActionRow.of(Button.primary("gameinfo:send:%s".formatted(currentState.gamePk()), "View Game Info")))
                     .queue();
             } catch (InsufficientPermissionException ignored) {
-                logger.debug("Insufficient permissions to send message to channel " + game.channelId());
+                logger.warn("Insufficient permissions to send message to channel {}", game.channelId());
             }
 
             // Check for scheduled game and end it, game is over
