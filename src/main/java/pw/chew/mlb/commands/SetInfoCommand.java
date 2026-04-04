@@ -89,7 +89,7 @@ public class SetInfoCommand extends SlashCommand {
                     divisionAbbreviation += word.substring(0, 1);
                 }
 
-                JSONObject standings = RestClient.get("https://statsapi.mlb.com/api/v1/standings?leagueId=103,104&standingsTypes=regularSeason&season=" + SEASON).asJSONObject();
+                JSONObject standings = RestClient.get("https://statsapi.mlb.com/api/v1/standings?leagueId=103,104&standingsTypes=regularSeason&hydrate=team&season=" + SEASON).asJSONObject();
 
                 // Gotta find the team now...
                 JSONArray records = standings.getJSONArray("records");
