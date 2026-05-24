@@ -44,12 +44,12 @@ public class PlanGameCommand extends SlashCommand {
         this.options = Arrays.asList(
             new OptionData(OptionType.INTEGER, "team", "The team to plan for", true, true)
                 .setDescriptionLocalization(DiscordLocale.SPANISH, "El equipo para planificar"),
-            new OptionData(OptionType.NUMBER, "date", "The date of the game. Select one from the list!", true, true)
+            new OptionData(OptionType.INTEGER, "date", "The date of the game. Select one from the list!", true, true)
                 .setDescriptionLocalization(DiscordLocale.SPANISH, "La fecha del juego. ¡Seleccione uno de la lista!"),
             new OptionData(OptionType.CHANNEL, "channel", "The channel to plan for", false)
                 .setDescriptionLocalization(DiscordLocale.SPANISH, "El canal para planificar")
                 .setChannelTypes(ChannelType.TEXT, ChannelType.FORUM),
-            new OptionData(OptionType.NUMBER, "sport", "The sport to plan a game for, Majors by default.", false, true)
+            new OptionData(OptionType.INTEGER, "sport", "The sport to plan a game for, Majors by default.", false, true)
                 .setDescriptionLocalization(DiscordLocale.SPANISH, "El deporte para planificar un juego, Majors de forma predeterminada."),
             new OptionData(OptionType.BOOLEAN, "thread", "Whether to make a thread or not. Defaults to true, required true for forums.", false)
                 .setDescriptionLocalization(DiscordLocale.SPANISH, "Si hacer un hilo o no. De forma predeterminada es verdadero, se requiere verdadero para los foros."),
@@ -67,8 +67,8 @@ public class PlanGameCommand extends SlashCommand {
     protected void execute(SlashCommandEvent event) {
         GuildChannel channel = event.getOption("channel", event.getGuildChannel(), OptionMapping::getAsChannel);
 
-        String gamePk = event.optString("date", "1");
-        GameBlurb blurb = new GameBlurb(gamePk);
+        int gamePk = event.getOption("date", -1, OptionMapping::getAsInt);
+        GameBlurb blurb = new GameBlurb(gamePk + "");
 
         boolean makeThread = event.optBoolean("thread", false);
         boolean makeEvent = event.optBoolean("event", false);
@@ -84,7 +84,7 @@ public class PlanGameCommand extends SlashCommand {
         status.add("Sending Message...");
 
         event.reply(String.join("\n", status)).setEphemeral(true)
-            .queue(interactionHook -> handle(interactionHook, gamePk, channel, blurb, makeThread, makeEvent, status));
+            .queue(interactionHook -> handle(interactionHook, gamePk + "", channel, blurb, makeThread, makeEvent, status));
     }
 
     public void handle(InteractionHook event, String gamePk, GuildChannel channel, GameBlurb blurb, boolean makeThread, boolean makeEvent, List<String> status) {

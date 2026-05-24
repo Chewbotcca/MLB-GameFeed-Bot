@@ -37,17 +37,17 @@ public class AutocompleteUtil {
         switch (event.getFocusedOption().getName()) {
             case "team" -> {
                 // get current value of sport
-                String sport = event.getOption("sport", "1", OptionMapping::getAsString);
+                int sport = event.getOption("sport", 1, OptionMapping::getAsInt);
                 String input = event.getFocusedOption().getValue();
 
-                return AutocompleteUtil.getTeams(sport, input);
+                return AutocompleteUtil.getTeams(sport + "", input);
             }
             case "sport" -> {
                 return AutocompleteUtil.getSports();
             }
             case "date", "game" -> {
                 int teamId = event.getOption("team", -1, OptionMapping::getAsInt);
-                String sport = event.getOption("sport", "1,51", OptionMapping::getAsString);
+                String sport = event.getOption("sport", "1", OptionMapping::getAsString);
 
                 return AutocompleteUtil.getTeamGames(teamId, sport);
             }
