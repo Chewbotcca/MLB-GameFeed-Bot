@@ -42,14 +42,14 @@ public class PlanGameCommand extends SlashCommand {
         );
 
         this.options = Arrays.asList(
-            new OptionData(OptionType.STRING, "team", "The team to plan for", true, true)
+            new OptionData(OptionType.INTEGER, "team", "The team to plan for", true, true)
                 .setDescriptionLocalization(DiscordLocale.SPANISH, "El equipo para planificar"),
-            new OptionData(OptionType.STRING, "date", "The date of the game. Select one from the list!", true, true)
+            new OptionData(OptionType.NUMBER, "date", "The date of the game. Select one from the list!", true, true)
                 .setDescriptionLocalization(DiscordLocale.SPANISH, "La fecha del juego. ¡Seleccione uno de la lista!"),
             new OptionData(OptionType.CHANNEL, "channel", "The channel to plan for", false)
                 .setDescriptionLocalization(DiscordLocale.SPANISH, "El canal para planificar")
                 .setChannelTypes(ChannelType.TEXT, ChannelType.FORUM),
-            new OptionData(OptionType.STRING, "sport", "The sport to plan a game for, Majors by default.", false, true)
+            new OptionData(OptionType.NUMBER, "sport", "The sport to plan a game for, Majors by default.", false, true)
                 .setDescriptionLocalization(DiscordLocale.SPANISH, "El deporte para planificar un juego, Majors de forma predeterminada."),
             new OptionData(OptionType.BOOLEAN, "thread", "Whether to make a thread or not. Defaults to true, required true for forums.", false)
                 .setDescriptionLocalization(DiscordLocale.SPANISH, "Si hacer un hilo o no. De forma predeterminada es verdadero, se requiere verdadero para los foros."),
