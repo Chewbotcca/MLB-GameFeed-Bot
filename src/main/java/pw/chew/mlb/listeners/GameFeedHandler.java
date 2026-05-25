@@ -524,8 +524,8 @@ public class GameFeedHandler {
 
             Instant sent = Instant.now();
             channel.sendMessageEmbeds(message).queueAfter(delay, TimeUnit.SECONDS, playMsg -> {
-                // Wait 45 seconds until after the original message was sent
-                long waitTime = 45 - Duration.between(sent, Instant.now()).getSeconds();
+                // Wait 180 seconds until after the original message was sent
+                long waitTime = 180 - Duration.between(sent, Instant.now()).getSeconds();
 
                 if (!gameState.potentialHomer()) return;
 
