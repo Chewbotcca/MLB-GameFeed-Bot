@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.LoggerFactory;
 import pw.chew.chewbotcca.util.RestClient;
 
 import java.time.OffsetDateTime;
@@ -91,6 +92,7 @@ public class AutocompleteUtil {
             return List.of(new Command.Choice("Please select a team first!", -1));
         }
 
+        LoggerFactory.getLogger(AutocompleteUtil.class).debug("Getting team games for team {} in sport {} in season {}", teamId, sportId, SEASON);
         JSONArray games = RestClient.get("https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=%S&season=%s&teamId=%S&fields=dates,date,games,gamePk,teams,away,team,teamName,id&hydrate=team&timeZone=America/New_York".formatted(sportId, SEASON, teamId))
             .asJSONObject()
             .getJSONArray("dates");
