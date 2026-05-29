@@ -12,10 +12,20 @@ import pw.chew.mlb.commands.StartGameCommand;
 import pw.chew.mlb.objects.GameBlurb;
 import pw.chew.mlb.objects.GameState;
 import pw.chew.mlb.util.EmbedUtil;
+import pw.chew.mlb.commands.TeamCommand;
+import pw.chew.mlb.util.MLBAPIUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class InteractionHandler extends ListenerAdapter {
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+        if (event.getComponentId().startsWith("team:")) {
+            TeamCommand.handleButton(event);
+            return;
+        }
+
         if (event.getComponentId().startsWith("plangame:")) {
             String action = event.getComponentId().split(":")[1];
             String gamePk = event.getComponentId().split(":")[2];
@@ -85,11 +95,9 @@ public class InteractionHandler extends ListenerAdapter {
         String type = parts[0];
 
         // Future proofing
-        //noinspection SwitchStatementWithTooFewBranches
         switch (type) {
-            case "gameinfo" -> {
-                GameInfoCommand.handleSelectMenu(event);
-            }
+            case "gameinfo" -> GameInfoCommand.handleSelectMenu(event);
+            case "team" -> TeamCommand.handleSelect(event);
         }
     }
 }

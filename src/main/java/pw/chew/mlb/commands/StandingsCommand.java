@@ -3,6 +3,7 @@ package pw.chew.mlb.commands;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.command.SlashCommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -42,8 +43,12 @@ public class StandingsCommand extends SlashCommand {
     protected void execute(SlashCommandEvent event) {
         String division = event.optString("division", "American League West");
 
+        event.replyEmbeds(buildDivisionEmbed(division)).setEphemeral(true).queue();
+    }
+
+    public static MessageEmbed buildDivisionEmbed(String division) {
         // first we get standings
-        var standings = MLBAPIUtil.getStandings().get(division);
+        var standings = MLBAPIUtil.getStandings("103,104").get(division);
 
         List<String> teams = new ArrayList<>();
         for (MLBAPIUtil.Standing standing : standings) {
@@ -64,6 +69,6 @@ public class StandingsCommand extends SlashCommand {
             .setTitle("Standings for " + division)
             .setDescription(String.join("\n", teams));
 
-        event.replyEmbeds(embed.build()).setEphemeral(true).queue();
+        return embed.build();
     }
 }
