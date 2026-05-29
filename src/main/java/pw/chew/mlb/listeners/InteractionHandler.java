@@ -4,14 +4,19 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
+import pw.chew.chewbotcca.util.MiscUtil;
 import pw.chew.mlb.commands.GameInfoCommand;
 import pw.chew.mlb.commands.PlanGameCommand;
+import pw.chew.mlb.commands.PlayerCommand;
 import pw.chew.mlb.commands.StartGameCommand;
 import pw.chew.mlb.objects.GameBlurb;
 import pw.chew.mlb.objects.GameState;
 import pw.chew.mlb.util.EmbedUtil;
+
+import java.util.List;
 
 public class InteractionHandler extends ListenerAdapter {
     @Override
@@ -72,6 +77,29 @@ public class InteractionHandler extends ListenerAdapter {
                     } else {
                         event.editMessageEmbeds(GameInfoCommand.buildGameInfoEmbed(state)).queue();
                     }
+                }
+            }
+        }
+
+        if (event.getComponentId().startsWith("player:")) {
+            String[] parts = event.getComponentId().split(":");
+            String action = parts[1];
+            int playerId = MiscUtil.asInt(parts[2]);
+            List<ActionRow> rows = event.getMessage().getActionRows();
+
+            switch (action) {
+                case "sites" -> {
+                    PlayerCommand.handleViewOnlineResponse(event, playerId);
+                }
+                case "info" -> {
+                    event.editMessageEmbeds(PlayerCommand.buildInfoEmbed(playerId))
+                        .setComponents(PlayerCommand.updateButtons(rows, "info"))
+                        .queue();
+                }
+                case "hitting" -> {
+                    event.editMessageEmbeds(PlayerCommand.buildHittingStatsEmbed(playerId))
+                        .setComponents(PlayerCommand.updateButtons(rows, "hitting"))
+                        .queue();
                 }
             }
         }
