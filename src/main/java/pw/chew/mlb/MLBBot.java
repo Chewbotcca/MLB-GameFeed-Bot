@@ -55,7 +55,7 @@ public class MLBBot {
         CommandClientBuilder client = new CommandClientBuilder();
 
         // Set the client settings
-        client.setActivity(Activity.watching("the regular season!"));
+        client.setActivity(Activity.watching("the all star game!")); // ASG
         client.setOwnerId(prop.getProperty("userId", "476488167042580481"));
         client.setPrefix("woody!");
 
