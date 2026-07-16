@@ -136,8 +136,6 @@ public class MLBAPIUtil {
     public record Teams(JSONArray raw) {
         public List<Command.Choice> asChoices() {
             List<Command.Choice> choices = new ArrayList<>();
-            // ASG Shenanigans
-            choices.add(new Command.Choice("All Star Game", 160));
             for (int i = 0; i < raw.length(); i++) {
                 JSONObject team = raw.getJSONObject(i);
                 choices.add(new Command.Choice(team.getString("name"), team.getInt("id")));
@@ -170,9 +168,6 @@ public class MLBAPIUtil {
                     potential.add(new Command.Choice(team.getString("name"), team.getInt("id")));
                 }
             }
-
-            // ASG Shenanigans
-            potential.add(new Command.Choice("All Star Game", 160));
 
             // Return the potential list, distinct, and no more than 25 choices
             return potential.stream().distinct().toList().subList(0, Math.min(potential.size(), 25));
