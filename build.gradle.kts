@@ -1,7 +1,7 @@
 plugins {
     id("java")
     application
-    kotlin("jvm") version "2.3.21"
+    kotlin("jvm") version "2.4.10"
 }
 
 group = "pw.chew"
@@ -19,10 +19,10 @@ repositories {
 }
 
 dependencies {
-    implementation("net.dv8tion", "JDA", "6.4.1")
+    implementation("net.dv8tion", "JDA", "6.5.0")
     implementation("pw.chew", "jda-chewtils", "2.2.1")
     implementation("org.json", "json", "20250517")
-    implementation("ch.qos.logback", "logback-classic", "1.5.32")
+    implementation("ch.qos.logback", "logback-classic", "1.5.38")
     implementation("mysql", "mysql-connector-java", "8.0.33")
     implementation("org.mapdb", "mapdb", "3.1.0")
     implementation("org.hibernate", "hibernate-core", "5.6.15.Final")
