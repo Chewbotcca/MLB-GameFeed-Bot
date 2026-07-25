@@ -43,7 +43,7 @@ public class StandingsCommand extends SlashCommand {
         String division = event.optString("division", "American League West");
 
         // first we get standings
-        var standings = MLBAPIUtil.getStandings().get(division);
+        var standings = MLBAPIUtil.getStandings("103,104").get(division);
 
         List<String> teams = new ArrayList<>();
         for (MLBAPIUtil.Standing standing : standings) {

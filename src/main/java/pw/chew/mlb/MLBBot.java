@@ -17,6 +17,7 @@ import pw.chew.mlb.commands.AdminCommand;
 import pw.chew.mlb.commands.ConfigCommand;
 import pw.chew.mlb.commands.GameInfoCommand;
 import pw.chew.mlb.commands.PlanGameCommand;
+import pw.chew.mlb.commands.ScheduleCommand;
 import pw.chew.mlb.commands.ScoreCommand;
 import pw.chew.mlb.commands.SetInfoCommand;
 import pw.chew.mlb.commands.StandingsCommand;
@@ -65,7 +66,7 @@ public class MLBBot {
         client.addSlashCommands(
             // Main commands
             new StartGameCommand(), new StopGameCommand(), new ScoreCommand(), new SetInfoCommand(), new ConfigCommand(),
-            new PlanGameCommand()
+            new PlanGameCommand(), new ScheduleCommand()
             , // Stats Commands
             new StandingsCommand(), new GameInfoCommand()
         );
