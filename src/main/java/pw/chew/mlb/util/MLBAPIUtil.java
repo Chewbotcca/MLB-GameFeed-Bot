@@ -7,17 +7,21 @@ import org.geysermc.discordbot.util.DicesCoefficient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import pw.chew.chewbotcca.util.RestClient;
+import pw.chew.mlb.objects.MLBTeam;
 
 import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static pw.chew.mlb.MLBBot.SEASON;
-import static pw.chew.mlb.MLBBot.TEAMS;
 
 public class MLBAPIUtil {
     /// CACHING ///
@@ -94,13 +98,26 @@ public class MLBAPIUtil {
         return response;
     }
 
+    public static List<Affiliate> getAffiliates(String teamId) {
+        JSONArray affiliates = RestClient.get("https://statsapi.mlb.com/api/v1/teams/affiliates?teamIds=%s&season=%s&hydrate=standings,sport&fields=teams,name,id,venue,name,league,division,sport,abbreviation,sortOrder,record,wins,losses,winningPercentage,active"
+            .formatted(teamId, SEASON)).asJSONObject().getJSONArray("teams");
+
+        // wrap each array item as an affiliate object
+        List<Affiliate> affiliatesList = new ArrayList<>();
+        for (int i = 0; i < affiliates.length(); i++) {
+            affiliatesList.add(new Affiliate(affiliates.getJSONObject(i)));
+        }
+        affiliatesList.sort(Comparator.comparingInt(Affiliate::sortOrder));
+        return affiliatesList;
+    }
+
     /**
      * Gets the current MLB standings.
      *
      * TODO: Support MiLB.
      */
-    public static Map<String, List<Standing>> getStandings() {
-        JSONArray standings = RestClient.get("https://statsapi.mlb.com/api/v1/standings?leagueId=103,104&hydrate=division&season=%s".formatted(SEASON)).asJSONObject().getJSONArray("records");
+    public static Map<String, List<Standing>> getStandings(String leagueId) {
+        JSONArray standings = RestClient.get("https://statsapi.mlb.com/api/v1/standings?leagueId=%s&hydrate=division&season=%s".formatted(leagueId, SEASON)).asJSONObject().getJSONArray("records");
         HashMap<String, List<Standing>> standingsMap = new HashMap<>();
         for (int i = 0; i < standings.length(); i++) {
             JSONObject division = standings.getJSONObject(i);
@@ -121,6 +138,31 @@ public class MLBAPIUtil {
         return standingsMap;
 
     }
+
+
+    public static List<Game> getSchedule(int teamId, String sportId) {
+        JSONArray games = new JSONObject(RestClient.get("https://statsapi.mlb.com/api/v1/schedule?lang=en&sportId=%s&season=%s&teamId=%s&hydrate=team&fields=totalGames,totalGamesInProgress,dates,date,games,gamePk,gameType,gameDate,status,detailedState,abstractGameState,teams,away,home,team,name,id,clubName,abbreviation,score,seriesGameNumber,seriesDescription"
+            .formatted(sportId, SEASON, teamId)))
+            .getJSONArray("dates");
+
+        // iterate through date
+        List<Game> schedule = new ArrayList<>();
+        for (int i = 0; i < games.length(); i++) {
+            // Formatted as YYYY-MM-DD
+            String date = games.getJSONObject(i).getString("date");
+
+            // iterate through games
+            JSONArray dayGames = games.getJSONObject(i).getJSONArray("games");
+            for (int j = 0; j < dayGames.length(); j++) {
+                JSONObject game = dayGames.getJSONObject(j);
+                schedule.add(new Game(game));
+            }
+        }
+
+        return schedule;
+    }
+
+    /// Records for data wrapping ///
 
     public record Sports(JSONArray raw) {
         public List<Command.Choice> asChoices() {
@@ -242,6 +284,70 @@ public class MLBAPIUtil {
         }
     }
 
+    public record Affiliate(JSONObject raw) {
+        public int id() {
+            return raw.getInt("id");
+        }
+
+        public String name() {
+            return raw.getString("name");
+        }
+
+        public String venueName() {
+            return raw.getJSONObject("venue").getString("name");
+        }
+
+        public String abbreviation() {
+            return raw.getString("abbreviation");
+        }
+
+        public int leagueId() {
+            return raw.getJSONObject("league").getInt("id");
+        }
+
+        public String leagueName() {
+            return raw.getJSONObject("league").getString("name");
+        }
+
+        public String divisionName() {
+            return raw.getJSONObject("division").getString("name");
+        }
+
+        public Sport sport() {
+            return new Sport(raw.getJSONObject("sport"));
+        }
+
+        public int wins() {
+            return raw.getJSONObject("record").getInt("wins");
+        }
+
+        public int losses() {
+            return raw.getJSONObject("record").getInt("losses");
+        }
+
+        public String pct() {
+            return raw.getJSONObject("record").getString("winningPercentage");
+        }
+
+        public boolean active() {
+            return raw.getBoolean("active");
+        }
+
+        public record Sport(JSONObject raw) {
+            public String name() {
+                return raw.getString("name");
+            }
+
+            public String abbreviation() {
+                return raw.getString("abbreviation");
+            }
+        }
+
+        public int sortOrder() {
+            return raw.getJSONObject("sport").getInt("sortOrder");
+        }
+    }
+
     public record Standing(JSONObject raw) {
         public String teamName() {
             // team > name
@@ -302,6 +408,54 @@ public class MLBAPIUtil {
             JSONObject lastTen = raw.getJSONObject("records").getJSONArray("splitRecords").getJSONObject(8);
             // wins - losses
             return "%s-%s".formatted(lastTen.getInt("wins"), lastTen.getInt("losses"));
+        }
+    }
+
+    public record Game(JSONObject raw) {
+        public String gamePk() {
+            return raw.getString("gamePk");
+        }
+
+        public String gameType() {
+            return raw.getString("gameType");
+        }
+
+        public OffsetDateTime gameDate() {
+            TemporalAccessor accessor = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(raw.getString("gameDate"));
+            return OffsetDateTime.from(accessor);
+        }
+
+        public String abstractGameState() {
+            return raw.getJSONObject("status").getString("abstractGameState");
+        }
+
+        public String detailedState() {
+            return raw.getJSONObject("status").getString("detailedState");
+        }
+
+        public boolean isCancelled() {
+            // detailedState == "Cancelled"
+            return detailedState().equals("Cancelled");
+        }
+
+        public boolean isFinal() {
+            return abstractGameState().equals("Final");
+        }
+
+        public MLBTeam away() {
+            return new MLBTeam(raw.getJSONObject("teams").getJSONObject("away"));
+        }
+
+        public MLBTeam home() {
+            return new MLBTeam(raw.getJSONObject("teams").getJSONObject("home"));
+        }
+
+        public int seriesGameNumber() {
+            return raw.getInt("seriesGameNumber");
+        }
+
+        public String seriesDescription() {
+            return raw.getString("seriesDescription");
         }
     }
 }
