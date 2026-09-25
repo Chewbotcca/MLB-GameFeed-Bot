@@ -1,7 +1,7 @@
 plugins {
     id("java")
     application
-    kotlin("jvm") version "2.3.21"
+    kotlin("jvm") version "2.4.20"
 }
 
 group = "pw.chew"
@@ -19,14 +19,14 @@ repositories {
 }
 
 dependencies {
-    implementation("net.dv8tion", "JDA", "6.4.1")
+    implementation("net.dv8tion", "JDA", "6.7.0")
     implementation("pw.chew", "jda-chewtils", "2.2.1")
     implementation("org.json", "json", "20250517")
-    implementation("ch.qos.logback", "logback-classic", "1.5.32")
+    implementation("ch.qos.logback", "logback-classic", "1.6.4")
     implementation("mysql", "mysql-connector-java", "8.0.33")
     implementation("org.mapdb", "mapdb", "3.1.0")
     implementation("org.hibernate", "hibernate-core", "5.6.15.Final")
-    implementation("com.github.ben-manes.caffeine", "caffeine", "3.2.4")
+    implementation("com.github.ben-manes.caffeine", "caffeine", "3.3.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.14.4")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.14.4")
