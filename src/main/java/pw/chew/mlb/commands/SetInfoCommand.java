@@ -18,16 +18,22 @@ import org.json.JSONObject;
 import pw.chew.chewbotcca.util.RestClient;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static pw.chew.mlb.MLBBot.SEASON;
 import static pw.chew.mlb.MLBBot.TEAMS;
 
 public class SetInfoCommand extends SlashCommand {
+    // Fallback if the MLB API doesn't return a venue time zone
+    static final String DEFAULT_TIME_ZONE = "America/New_York";
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("h:mm a", Locale.US);
 
     public SetInfoCommand() {
         this.name = "setinfo";
@@ -124,7 +130,7 @@ public class SetInfoCommand extends SlashCommand {
             case "nextgame" -> {
                 int teamId = teamInfo.getInt("id");
 
-                JSONObject teamSchedule = RestClient.get(String.format("https://statsapi.mlb.com/api/v1/teams/%s?season=%s&hydrate=nextSchedule", teamId, SEASON)).asJSONObject();
+                JSONObject teamSchedule = RestClient.get(String.format("https://statsapi.mlb.com/api/v1/teams/%s?season=%s&hydrate=nextSchedule,venue(timezone)", teamId, SEASON)).asJSONObject();
 
                 JSONObject nextGame = null;
 
@@ -158,16 +164,14 @@ public class SetInfoCommand extends SlashCommand {
 
                 String opponent = getTeamInfo(nextGame.getJSONObject("teams").getJSONObject(isHome ? "away" : "home").getJSONObject("team").getString("name")).getString("abbreviation");
 
-                OffsetDateTime gameTime = OffsetDateTime.parse(nextGame.getString("gameDate"));
-                // Set the time zone to America/Chicago
-                gameTime = gameTime.withOffsetSameInstant(OffsetDateTime.now().getOffset());
-                // Convert the game time to MM/DD
-                String gameDate = String.format("%s/%s", gameTime.getMonthValue(), gameTime.getDayOfMonth());
-                // Get the time in Central Time, HH:mm A/PM
-                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mm a");
-                String gameTimeString = gameTime.format(timeFormatter);
+                // Show the start time in the selected team's home time zone, not the bot host's
+                String teamTimeZone = getVenueTimeZone(teamSchedule.getJSONArray("teams").getJSONObject(0));
 
-                info = String.format("%s: %s %s, %s", gameDate, isHome ? "vs" : "@", opponent, gameTimeString);
+                info = String.format("%s: %s %s, %s",
+                    formatGameDate(nextGame.getString("gameDate"), teamTimeZone),
+                    isHome ? "vs" : "@",
+                    opponent,
+                    formatGameTime(nextGame.getString("gameDate"), teamTimeZone));
             }
         }
 
@@ -220,6 +224,46 @@ public class SetInfoCommand extends SlashCommand {
 
         // Send a message if we don't know what team
         return potential;
+    }
+
+    /**
+     * Reads the venue time zone from a team object hydrated with venue(timezone).
+     *
+     * @param team a team object from the MLB API /teams endpoint
+     * @return the IANA time zone ID, e.g. "America/Chicago", or {@link #DEFAULT_TIME_ZONE} if missing
+     */
+    static String getVenueTimeZone(JSONObject team) {
+        JSONObject venue = team.optJSONObject("venue");
+        if (venue == null) return DEFAULT_TIME_ZONE;
+        JSONObject timeZone = venue.optJSONObject("timeZone");
+        if (timeZone == null) return DEFAULT_TIME_ZONE;
+        return timeZone.optString("id", DEFAULT_TIME_ZONE);
+    }
+
+    /**
+     * Converts an MLB API game date (UTC, ISO-8601) to the given time zone.
+     *
+     * @param gameDate the "gameDate" value from the MLB API, e.g. "2026-06-10T22:50:00Z"
+     * @param timeZoneId an IANA time zone ID, e.g. "America/Chicago"
+     * @return the game start time in that zone
+     */
+    static ZonedDateTime toTimeZone(String gameDate, String timeZoneId) {
+        return OffsetDateTime.parse(gameDate).atZoneSameInstant(ZoneId.of(timeZoneId));
+    }
+
+    /**
+     * @return the game date as M/D in the given time zone, e.g. "6/10"
+     */
+    static String formatGameDate(String gameDate, String timeZoneId) {
+        ZonedDateTime time = toTimeZone(gameDate, timeZoneId);
+        return String.format("%s/%s", time.getMonthValue(), time.getDayOfMonth());
+    }
+
+    /**
+     * @return the game start time in the given time zone, e.g. "5:50 PM"
+     */
+    static String formatGameTime(String gameDate, String timeZoneId) {
+        return toTimeZone(gameDate, timeZoneId).format(TIME_FORMATTER);
     }
 
     private JSONObject getTeamInfo(String teamName) {
